@@ -34,7 +34,7 @@ function ZoomButtons() {
   const map = useMap();
 
   return (
-    <div className="absolute bottom-24 left-4 z-[1000] flex flex-col gap-2">
+    <div className="absolute bottom-24 left-4 z-[400] flex flex-col gap-2">
       <Button 
         variant="secondary"
         size="icon"
@@ -82,7 +82,7 @@ export default function MainPage() {
 
   return (
     <div className="flex flex-col h-screen bg-background text-foreground">
-      <Card className="rounded-none border-b">
+      <Card className="rounded-none border-b z-[500]">
         <CardContent className="flex justify-between items-center p-4">
           <Sheet>
             <SheetTrigger asChild>
@@ -90,14 +90,30 @@ export default function MainPage() {
                 <Menu className="h-6 w-6" />
               </Button>
             </SheetTrigger>
-            <SheetContent side="left">
+            <SheetContent side="left" className="w-[300px] sm:w-[400px] z-[1001]">
               <SheetHeader>
                 <SheetTitle>Menu</SheetTitle>
                 <SheetDescription>
                   Access additional features and settings here.
                 </SheetDescription>
               </SheetHeader>
-              {/* Add menu items here */}
+              <div className="py-4">
+                <h3 className="mb-2 text-lg font-semibold">Menu Items</h3>
+                <ul className="space-y-2">
+                  <li>
+                    <Button variant="ghost" className="w-full justify-start">Profile</Button>
+                  </li>
+                  <li>
+                    <Button variant="ghost" className="w-full justify-start">Ride History</Button>
+                  </li>
+                  <li>
+                    <Button variant="ghost" className="w-full justify-start">Settings</Button>
+                  </li>
+                  <li>
+                    <Button variant="ghost" className="w-full justify-start">Help</Button>
+                  </li>
+                </ul>
+              </div>
             </SheetContent>
           </Sheet>
           <h1 className="text-xl font-bold">TaxiNow</h1>
@@ -116,7 +132,7 @@ export default function MainPage() {
           <SetViewOnClick coords={center} />
           <ZoomButtons />
         </MapContainer>
-        <Card className="absolute top-4 left-4 right-4 z-[1000] mx-auto max-w-md">
+        <Card className="absolute top-4 left-4 right-4 z-[500] mx-auto max-w-md">
           <CardContent className="p-2">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
@@ -131,12 +147,12 @@ export default function MainPage() {
         <Button 
           variant="secondary"
           size="icon"
-          className="absolute bottom-24 right-4 rounded-full shadow-lg z-[1000]"
+          className="absolute bottom-24 right-4 rounded-full shadow-lg z-[500]"
           onClick={handleRecenter}
         >
           <Navigation className="h-6 w-6" />
         </Button>
-        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background to-transparent z-[1000]">
+        <div className="absolute bottom-0 left-0 right-0 p-4 bg-gradient-to-t from-background to-transparent z-[500]">
           <Button className="w-full py-6 text-lg font-semibold" size="lg">
             Book a Ride
           </Button>
