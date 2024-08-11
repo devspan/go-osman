@@ -1,9 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,4 +8,79 @@ generator client {
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  name      String?
+  email     String    @unique
+  password  String
+  role      UserRole  @default(PASSENGER)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  rides     Ride[]
+  payments  Payment[]
+  driver    Driver?   // Add this line to create the reverse relation
+}
+
+model Ride {
+  id            String    @id @default(uuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  driverId      String?
+  driver        Driver?   @relation(fields: [driverId], references: [id])
+  startLocation String
+  endLocation   String
+  status        RideStatus
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  payment       Payment?
+}
+
+model Driver {
+  id        String   @id @default(uuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id])
+  rides     Ride[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Payment {
+  id        String        @id @default(uuid())
+  rideId    String        @unique
+  ride      Ride          @relation(fields: [rideId], references: [id])
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  amount    Float
+  status    PaymentStatus
+  method    PaymentMethod
+  createdAt DateTime      @default(now())
+  updatedAt DateTime      @updatedAt
+}
+
+enum UserRole {
+  ADMIN
+  PASSENGER
+  DRIVER
+}
+
+enum RideStatus {
+  REQUESTED
+  ACCEPTED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  PAID
+}
+
+enum PaymentStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
+
+enum PaymentMethod {
+  CASH
+  // Add more payment methods in the future
 }
