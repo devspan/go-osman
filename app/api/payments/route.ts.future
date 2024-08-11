@@ -1,0 +1,54 @@
+// src/app/api/payments/route.ts
+import { NextResponse } from "next/server";
+import { getServerSession } from "next-auth/next";
+import { authOptions } from "@/lib/auth";
+import { PrismaClient } from "@prisma/client";
+import { z } from "zod";
+
+const prisma = new PrismaClient();
+
+const paymentSchema = z.object({
+  rideId: z.string().uuid(),
+  amount: z.number().positive(),
+  paymentMethod: z.enum(["CREDIT_CARD", "DEBIT_CARD", "PAYPAL"]),
+});
+
+export async function POST(request: Request) {
+  try {
+    const session = await getServerSession(authOptions);
+    
+    if (!session || !session.user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const body = await request.json();
+    const validatedData = paymentSchema.parse(body);
+
+    const ride = await prisma.ride.findUnique({
+      where: { id: validatedData.rideId },
+    });
+
+    if (!ride || ride.userId !== session.user.id) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    // Here you would integrate with a payment gateway
+    // For this example, we'll just create a payment record
+
+    const payment = await prisma.payment.create({
+      data: {
+        rideId: validatedData.rideId,
+        amount: validatedData.amount,
+        paymentMethod: validatedData.paymentMethod,
+        status: "COMPLETED",
+      },
+    });
+
+    return NextResponse.json(payment, { status: 201 });
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json({ error: error.errors }, { status: 400 });
+    }
+    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+  }
+}
